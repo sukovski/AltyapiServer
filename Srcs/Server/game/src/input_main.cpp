@@ -2958,6 +2958,34 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 	else if (p->type == REFINE_TYPE_SCROLL || p->type == REFINE_TYPE_HYUNIRON || p->type == REFINE_TYPE_MUSIN || p->type == REFINE_TYPE_BDRAGON)
 	{
 		sys_log (0, "refine_type_scroll, ...");
+
+		// Scroll type ile ger?ek scroll value e?le?mesini kontrol et
+		// Aksi takdirde client yanl©¥? type paketi g?ndererek scroll tipini de?i?tirebilir
+		LPITEM pkScroll = ch->GetInventoryItem(ch->GetRefineAdditionalCell());
+		if (pkScroll)
+		{
+			int scrollVal = pkScroll->GetValue(0);
+			bool bTypeMatch = false;
+
+			if (p->type == REFINE_TYPE_SCROLL && (scrollVal == 0 || scrollVal == YONGSIN_SCROLL || scrollVal == YAGONG_SCROLL))
+				bTypeMatch = true;
+			else if (p->type == REFINE_TYPE_MUSIN && scrollVal == MUSIN_SCROLL)
+				bTypeMatch = true;
+			else if (p->type == REFINE_TYPE_HYUNIRON && scrollVal == HYUNIRON_CHN)
+				bTypeMatch = true;
+			else if (p->type == REFINE_TYPE_BDRAGON && scrollVal == BDRAGON_SCROLL)
+				bTypeMatch = true;
+
+			if (!bTypeMatch)
+			{
+				sys_err("[REFINE_HACK] Type mismatch! p->type=%d scrollVal=%d player=%s",
+						p->type, scrollVal, ch->GetName());
+				LogManager::instance().HackLog("REFINE_TYPE_MISMATCH", ch);
+				ch->ClearRefineMode();
+				return;
+			}
+		}
+
 		ch->DoRefineWithScroll(item);
 	}
 	else if (p->type == REFINE_TYPE_MONEY_ONLY)
