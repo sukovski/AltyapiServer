@@ -1167,6 +1167,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		int				m_iRefineAdditionalCell;
 		bool			m_bUnderRefine;
 		DWORD			m_dwRefineNPCVID;
+		DWORD			m_dwRefineScrollID;		// scroll swap exploit koruması
 
 	public:
 		////////////////////////////////////////////////////////////////////////////////////////

@@ -1018,6 +1018,16 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	if (!pkItemScroll)
 		return false;
 
+	// Scroll swap exploit koruması
+	// RefineInformation sırasında hangi scroll seçildiyse o olmalı
+	if (m_dwRefineScrollID != 0 && pkItemScroll->GetID() != m_dwRefineScrollID)
+	{
+		sys_err("[REFINE_HACK] Scroll swap detected! Expected ID %u, Got %u, Player: %s",
+				m_dwRefineScrollID, pkItemScroll->GetID(), GetName());
+		LogManager::instance().HackLog("REFINE_SCROLL_SWAP", this);
+		return false;
+	}
+
 	if (!(pkItemScroll->GetType() == ITEM_USE && pkItemScroll->GetSubType() == USE_TUNING))
 		return false;
 
@@ -6937,11 +6947,16 @@ void CHARACTER::SetRefineMode(int iAdditionalCell)
 {
 	m_iRefineAdditionalCell = iAdditionalCell;
 	m_bUnderRefine = true;
+
+	// Scroll swap exploit koruması: scroll'ün item ID'sini sabitle
+	LPITEM pkScroll = GetInventoryItem(iAdditionalCell);
+	m_dwRefineScrollID = pkScroll ? pkScroll->GetID() : 0;
 }
 
 void CHARACTER::ClearRefineMode()
 {
 	m_bUnderRefine = false;
+	m_dwRefineScrollID = 0;
 	SetRefineNPC( NULL );
 }
 
