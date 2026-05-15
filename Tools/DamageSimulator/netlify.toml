@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[env]
+  [env.production]
+    NODE_ENV = "production"
